@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="picker/jpicker.css">
+    <script src="picker/jquery-1.12.0.js"></script>
+    <script src="picker/bscroll.js"></script>
+    <script src="picker/jpicker.js"></script>
+</head>
+<body>
+    <button id="show">显示</button>
+    </br>
+    <button id="hide">隐藏</button>
+
+    <script>
+        var list = [];
+
+        for(var i=0;i<10;i++){
+            var obj = {
+                value:i,
+                text:'测试'+i
+            }
+            list.push(obj)
+        }
+        
+        var picker = new JPicker();
+
+        picker.create(list,2,{
+            confirmCallback:function(data,index){
+                console.log(data)
+                console.log(index)
+                this.hide()
+            }
+        })
+
+        $('#show').on('click',function(){
+            picker.show()
+        })
+
+    </script>
+</body>
+</html>

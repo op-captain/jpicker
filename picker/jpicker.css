@@ -1,0 +1,229 @@
+/* reset */
+div,
+ul,
+li {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+:focus {
+    outline: 0;
+}
+
+ol,
+ul {
+    list-style: none;
+}
+
+
+.j-popup {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.j-mask {
+    overflow: hidden;
+    background-color: #25262d;
+    opacity: .4;
+    pointer-events: auto;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.j-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-transform: translate(100%, 100%);
+    transform: translate(100%, 100%);
+}
+
+.j-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-transform: translate(-100%, -100%);
+    transform: translate(-100%, -100%);
+    pointer-events: auto;
+}
+
+.j-picker-panel {
+    display: none;
+    height: 273px;
+    text-align: center;
+    font-size: 12px;
+    background: #fff;
+}
+
+.j-picker-content {
+    position: relative;
+    top: 20px;
+}
+
+
+
+.j-picker-wheel-wrapper {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    padding: 0 16px;
+}
+
+.j-picker-content>i {
+    position: absolute;
+    z-index: 10;
+    left: 0;
+    width: 100%;
+    height: 68px;
+    pointer-events: none;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+}
+
+.border-bottom-1px:after,
+.border-bottom-1px:before,
+.border-left-1px:after,
+.border-left-1px:before,
+.border-right-1px:after,
+.border-right-1px:before,
+.border-top-1px:after,
+.border-top-1px:before {
+    content: "";
+    display: block;
+    position: absolute;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+}
+
+
+.j-picker-content>.border-bottom-1px {
+    top: 0;
+    background: -webkit-linear-gradient(bottom, hsla(0, 0%, 100%, .4), hsla(0, 0%, 100%, .8));
+    background: linear-gradient(0deg, hsla(0, 0%, 100%, .4), hsla(0, 0%, 100%, .8));
+}
+
+.j-picker-content>.border-top-1px {
+    bottom: 0;
+    background: -webkit-linear-gradient(top, hsla(0, 0%, 100%, .4), hsla(0, 0%, 100%, .8));
+    background: linear-gradient(180deg, hsla(0, 0%, 100%, .4), hsla(0, 0%, 100%, .8));
+}
+
+.border-bottom-1px:after{
+    border-bottom: 1px solid #ebebeb;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    -webkit-transform-origin: 0 bottom;
+    transform-origin: 0 bottom;
+}
+
+.border-top-1px:before{
+    border-top: 1px solid #ebebeb;
+    left: 0;
+    top: 0;
+    width: 100%;
+    -webkit-transform-origin: 0 top;
+    transform-origin: 0 top;
+}
+
+
+/*核心内容应该处于 Safe area 确保不会被设备圆角(corners)，传感器外壳(sensor housing，齐刘海) 
+以及底部的 Home Indicator 遮挡。也就是说 我们设计显示的内容应该尽可能的在安全区域内；*/
+.j-safe-area-pb {
+    padding-bottom: constant(safe-area-inset-bottom) !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+}
+
+
+.j-picker-wheel-wrapper>div {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    flex: 1;
+    -webkit-flex-basis: 1e-9px;
+    flex-basis: 1e-9px;
+    width: 1%;
+    height: 173px;
+    overflow: hidden;
+    font-size: 20px;
+}
+
+.j-picker-wheel-scroll {
+    padding: 0;
+    margin-top: 68px;
+    line-height: 36px;
+    list-style: none;
+}
+
+.j-picker-wheel-item {
+    list-style: none;
+    height: 36px;
+    overflow: hidden;
+    white-space: nowrap;
+    color: #000;
+}
+
+.j-picker-choose {
+    position: relative;
+    height: 60px;
+}
+
+.j-picker-cancel {
+    position: absolute;
+    left: 0;
+    color: #999;
+    
+}
+
+
+.j-picker-confirm {
+    position: absolute;
+    right: 0;
+    color: #fc9153;
+}
+
+.j-picker-cancel, .j-picker-confirm{
+    line-height: 60px;
+    padding: 0 16px;
+    box-sizing: content-box;
+    font-size: 14px;
+}
+
+.j-picker-title-group {
+    padding: 0 60px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    height: 100%;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.j-picker-title {
+    font-size: 18px;
+    line-height: 25px;
+    font-weight: 400;
+    color: #333;
+}
+
+.j-picker-footer {
+    height: 20px;
+}
