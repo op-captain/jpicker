@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,36 +11,44 @@
     <script src="picker/bscroll.js"></script>
     <script src="picker/jpicker.js"></script>
 </head>
+
 <body>
     <button id="show">显示</button>
     </br>
     <button id="hide">隐藏</button>
 
     <script>
-        var list = [];
+        //数据
+        var list = [[],[]];
 
-        for(var i=0;i<10;i++){
-            var obj = {
-                value:i,
-                text:'测试'+i
+        for (var i = 0; i < list.length; i++) {
+            for (var n = 0; n < 10; n++) {
+                var obj = {
+                    value: n,
+                    text: i + '-测试-' + n
+                }
+                list[i].push(obj)
             }
-            list.push(obj)
         }
-        
+
+
+        //picker实例 picker.create([[obj1,obj2],[obj1,obj2],[obj1,obj2]], [index1,index2,index3], {option})
         var picker = new JPicker();
 
-        picker.create(list,2,{
-            confirmCallback:function(data,index){
+        picker.create(list, [1,3], {
+            confirmCallback: function (data, index) {
                 console.log(data)
                 console.log(index)
                 this.hide()
             }
         })
 
-        $('#show').on('click',function(){
+        //api调用 显示
+        $('#show').on('click', function () {
             picker.show()
         })
 
     </script>
 </body>
+
 </html>

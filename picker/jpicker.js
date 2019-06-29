@@ -50,9 +50,15 @@
 
             //数据
             this._values = values || [];
+            //是否有数据在加载
+            this.pending = false;
+            var len =  this._values.length;
+
+            //存放所有BSroller
+            this.BScroller = []
 
             //当前选中项的索引
-            this._selectedIndex = selectedIndex || 0;
+            this._selectedIndex = selectedIndex.concat();
 
             //默认选项配置
             var defaultOption = {
@@ -67,8 +73,10 @@
             //设置样式
             this._setStyle();
 
-            //
-            this._renderScrollList()
+            //渲染列表    
+            for(var i=0;i<len;i++){
+                this._renderScrollList(this._values[i])
+            }
 
             //DOM渲染到页面中
             $('body').append(this.$dom)
@@ -78,23 +86,29 @@
 
             //创建iScroll
             setTimeout(function () {
-                that._createScroll()
-            }, 200)
+                for(var i=0;i<len;i++){
+                    that._createScroll(i)
+                }
+            },0)
 
 
         },
         show: function (index) {
             var that = this;
             var $panel = this.$dom.find('.j-picker-panel')
-
+            var len =  this._values.length;
             //动画
             this.$dom.fadeIn()
             $panel.slideDown()
 
             setTimeout(function(){
-                that.iScroller.refresh()
-                that.iScroller.wheelTo(that._selectedIndex || index)
-            },200)
+                
+                for(var i=0;i<len;i++){
+                    that.BScroller[i].refresh()
+                    that.BScroller[i].wheelTo(that._selectedIndex[i] || index)
+                }
+                
+            },0)
             
         },
         hide: function () {
@@ -107,7 +121,7 @@
 
         },
         //渲染数据列表
-        _renderScrollList: function () {
+        _renderScrollList: function (list) {
             var $div = $('<div></div>');
             var $wrap = this.$dom.find('#jPickerContent')
             var $ul = $('<ul></ul>');
@@ -115,7 +129,7 @@
             $ul.addClass('j-picker-wheel-scroll')
             $div.append($ul)
 
-            $.each(this._values, function (i, v) {
+            $.each(list, function (i, v) {
                 var $li = $('<li></li>')
 
                 $li.data('v', v.value).text(v.text).addClass('j-picker-wheel-item')
@@ -131,19 +145,26 @@
                 that.hide()
             })
             //
+            //确定按钮
             this.$dom.find('.j-picker-confirm').on('click',function(){
-                var currentData = that._getCurrentData();
+                if(!that._canConfirm()){
+                    return false;
+                }
+                var currentData = [];
+                var len =  that._values.length;
 
-                setTimeout(function(){
-                    that.option.confirmCallback.call(that,currentData[0],that._selectedIndex)
-                },300)
+                for(var i=0;i<len;i++){
+                    currentData.push( that._getCurrentData(that._values[i],i)[0] );
+                }
                 
+                that.option.confirmCallback.call(that,currentData,that._selectedIndex)
+               
             })
         },
-        _getCurrentData:function(){
+        _getCurrentData:function(value,n){
             var that = this;
-            return $.map(this._values,function(v,i){
-                if(that._selectedIndex == i){
+            return $.map(value,function(v,i){
+                if(that._selectedIndex[n] == i){
                     return v;
                 }
             })
@@ -151,14 +172,14 @@
         /**
          * 创建better-scroll
          */
-        _createScroll: function () {
+        _createScroll: function (idx) {
             var that = this;
             var wheelWrapper = document.getElementById('jPickerContent');
-            var wheeler = this.iScroller = new BScroll(wheelWrapper.children[0], {
+            var wheeler = this.BScroller[idx] = new BScroll(wheelWrapper.children[idx], {
                 //作用：这个配置是为了做 Picker 组件用的，默认为 false，如果开启则需要配置一个 Object。
                 //wheelWrapperClass 和 wheelItemClass 必须对应于你的实例 better-scroll 的 wrapper 类名和 wrapper 内的子类名。二者的默认值是 "wheel-scroll"/"wheel-item"
                 wheel: {
-                    selectedIndex: this._selectedIndex || 0,
+                    selectedIndex: this._selectedIndex[idx] || 0,
                     wheelWrapperClass: 'j-picker-wheel-scroll',
                     wheelItemClass: 'j-picker-wheel-item'
                 },
@@ -166,13 +187,20 @@
                 //它会额外增加一些性能开销，如果你能明确地知道 scroller 内部 DOM 的变化时机并手动调用 refresh 重新计算，你可以把该选项设置为 false。
                 observeDOM: false
             });
-            wheeler.on('scrollEnd', function(){
-                var idx = wheeler.getSelectedIndex();
-                that._selectedIndex = isNaN(idx) ? that._selectedIndex : idx;
-                console.log( wheeler.getSelectedIndex() );
+            //BScroll的索引 会有多个BScroll
+            wheeler.idx = idx;
 
+            wheeler.on('scrollEnd', function(){
+                //当前BScroll选中的item
+                var selectedIdx = this.getSelectedIndex();
+                that._selectedIndex[this.idx] = isNaN(selectedIdx) ? that._selectedIndex[this.idx] : selectedIdx;
             })
         },
+        _canConfirm() {
+            return !this.pending && this.BScroller.every((wheel) => {
+              return !wheel.isInTransition
+            })
+          },
         _setStyle: function () {
             this.$dom.css({
                 "z-index": this.option.zIndex
