@@ -19,7 +19,7 @@
 
     <script>
         //数据
-        var list = [[],[]];
+        var list = [[], [], []];
 
         for (var i = 0; i < list.length; i++) {
             for (var n = 0; n < 10; n++) {
@@ -31,17 +31,82 @@
             }
         }
 
+        //级联数据
+        var cascade = []
 
-        //picker实例 picker.create([[obj1,obj2],[obj1,obj2],[obj1,obj2]], [index1,index2,index3], {option})
+        //cascade
+        function createCascade(list, level, n, l) {
+            for (var e = 0; e < n; e++) {
+                var k = level;
+                var obj = {
+                    value: (l - level + 1) + "--" + (e + 1),
+                    text: (l - level + 1) + '-casc-' + (e + 1),
+                    children: []
+                }
+                list.push(obj)
+                if (k > 1) {
+                    createCascade(obj.children, --k, n, l)
+                }
+            }
+
+            return list;
+        }
+        createCascade(cascade, 3, 2, 3)
+        console.log(cascade)
+
+        cascade = [{
+            "value": "1--1",
+            "text": "1-casc-1",
+            "children": [{
+                "value": "2--1",
+                "text": "2-casc-1",
+                "children": [{
+                    "value": "3--1",
+                    "text": "3-casc-1",
+                    "children": []
+                }]
+            }, {
+                "value": "2--2",
+                "text": "2-casc-2",
+                "children": [{
+                    "value": "3--1",
+                    "text": "3-casc-1",
+                    "children": []
+                }, {
+                    "value": "3--2",
+                    "text": "3-casc-2",
+                    "children": []
+                }]
+            }]
+        }, {
+            "value": "1--2",
+            "text": "1-casc-2",
+            "children": [{
+                "value": "2--1",
+                "text": "2-casc-1",
+                "children": [{
+                    "value": "3--1",
+                    "text": "3-casc-1",
+                    "children": []
+                }, {
+                    "value": "3--2",
+                    "text": "3-casc-2",
+                    "children": []
+                }]
+            }]
+        }]
+
+
+        //picker实例 picker.create([[obj1,obj2],[obj1,obj2],[obj1,obj2]], [index1,index2,index3], {option},boolean) 最后一个参数为 真 表示级联菜单
         var picker = new JPicker();
 
-        picker.create(list, [1,3], {
+        picker.create(list, [1, 0, 0], {
             confirmCallback: function (data, index) {
                 console.log(data)
                 console.log(index)
                 this.hide()
             }
-        })
+        }, false)
 
         //api调用 显示
         $('#show').on('click', function () {

@@ -44,18 +44,23 @@
          * @param {*} selectedIndex 当前选中项的索引
          * @param {*} option 选项配置
          */
-        create: function (values, selectedIndex, option) {
+        create: function (values, selectedIndex, option, isCascade) {
             var that = this;
+
             option = option || {};
 
-            //数据
-            this._values = values || [];
+            this.maxColoum = 3;
+
+            this._values = [];
+
+            this.isCascade = isCascade;
+
             //是否有数据在加载
             this.pending = false;
-            var len =  this._values.length;
 
             //存放所有BSroller
             this.BScroller = []
+
 
             //当前选中项的索引
             this._selectedIndex = selectedIndex.concat();
@@ -63,53 +68,45 @@
             //默认选项配置
             var defaultOption = {
                 zIndex: 999, //绝对定位的坐标值
-                confirmCallback:function(){ //选择确定后的回调
+                confirmCallback: function () { //选择确定后的回调
 
                 }
             }
+
 
             this.option = $.extend({}, defaultOption, option)
 
             //设置样式
             this._setStyle();
 
-            //渲染列表    
-            for(var i=0;i<len;i++){
-                this._renderScrollList(this._values[i])
+            //数据
+            if (isCascade) {
+                this.casCadeData = values || [];
+                this._updatePickerData(); //级联数据。级联数据需要通过 _updatePickerData方法，放入到 this._values 里面
+                this._renderInitColoum()
+
+            } else {
+                this._values = values || []; //渲染列表的数据
+                this._renderInitColoum()
             }
-
-            //DOM渲染到页面中
-            $('body').append(this.$dom)
-
-            //绑定事件
-            this._bindEvent()
-
-            //创建iScroll
-            setTimeout(function () {
-                for(var i=0;i<len;i++){
-                    that._createScroll(i)
-                }
-            },0)
-
-
         },
         show: function (index) {
             var that = this;
             var $panel = this.$dom.find('.j-picker-panel')
-            var len =  this._values.length;
+            var len = this._values.length;
             //动画
             this.$dom.fadeIn()
             $panel.slideDown()
 
-            setTimeout(function(){
-                
-                for(var i=0;i<len;i++){
+            setTimeout(function () {
+
+                for (var i = 0; i < len; i++) {
                     that.BScroller[i].refresh()
                     that.BScroller[i].wheelTo(that._selectedIndex[i] || index)
                 }
-                
-            },0)
-            
+
+            }, 0)
+
         },
         hide: function () {
             var $panel = this.$dom.find('.j-picker-panel')
@@ -119,6 +116,31 @@
         },
         destroyed: function () {
 
+        },
+        _renderInitColoum: function () {
+            var that = this;
+
+            var len = this._values.length;
+
+            //渲染列表 如果是级联系数据，需要先更新数据
+
+            for (var i = 0; i < len; i++) {
+                this._renderScrollList(this._values[i])
+            }
+
+
+            //DOM渲染到页面中
+            $('body').append(this.$dom)
+
+            //绑定事件
+            this._bindEvent()
+
+            //创建iScroll
+            setTimeout(function () {
+                for (var i = 0; i < len; i++) {
+                    that._createScroll(i)
+                }
+            }, 0)
         },
         //渲染数据列表
         _renderScrollList: function (list) {
@@ -146,25 +168,25 @@
             })
             //
             //确定按钮
-            this.$dom.find('.j-picker-confirm').on('click',function(){
-                if(!that._canConfirm()){
+            this.$dom.find('.j-picker-confirm').on('click', function () {
+                if (!that._canConfirm()) {
                     return false;
                 }
                 var currentData = [];
-                var len =  that._values.length;
+                var len = that._values.length;
 
-                for(var i=0;i<len;i++){
-                    currentData.push( that._getCurrentData(that._values[i],i)[0] );
+                for (var i = 0; i < len; i++) {
+                    currentData.push(that._getCurrentData(that._values[i], i)[0]);
                 }
-                
-                that.option.confirmCallback.call(that,currentData,that._selectedIndex)
-               
+
+                that.option.confirmCallback.call(that, currentData, that._selectedIndex)
+
             })
         },
-        _getCurrentData:function(value,n){
+        _getCurrentData: function (value, n) {
             var that = this;
-            return $.map(value,function(v,i){
-                if(that._selectedIndex[n] == i){
+            return $.map(value, function (v, i) {
+                if (that._selectedIndex[n] == i) {
                     return v;
                 }
             })
@@ -190,17 +212,82 @@
             //BScroll的索引 会有多个BScroll
             wheeler.idx = idx;
 
-            wheeler.on('scrollEnd', function(){
+            wheeler.on('scrollEnd', function () {
+
+                that._pickerChange.call(this, that)
+
+            })
+        },
+        _updatePickerData: function (fromColumn) { //级联数据使用
+            fromColumn = fromColumn || 0;
+            var i = 0;
+            var data = this.casCadeData;
+            var col = []; //更新了那几列数据
+            while (data) {
+                if (i >= fromColumn) {
+                    var coloumData = []
+
+                    $.each(data, function (i, v) {
+                        var obj = $.extend({}, v)
+
+                        coloumData.push(obj)
+                    })
+
+                    this._values[i] = coloumData;
+
+                    this._selectedIndex[i] = this._selectedIndex[i] < data.length ? this._selectedIndex[i] || 0 : 0;
+
+                    col.push(i)
+                }
+
+                if (data[this._selectedIndex[i]].children && i == this.maxColoum - 1) {
+                    data = null;
+                } else {
+                    data = data.length ? data[this._selectedIndex[i]].children : null;
+                }
+
+                i++;
+
+            }
+            return col;
+        },
+        _pickerChange: function (that) {
+
+            if (this.getSelectedIndex() !== that._selectedIndex[this.idx]) {
                 //当前BScroll选中的item
                 var selectedIdx = this.getSelectedIndex();
                 that._selectedIndex[this.idx] = isNaN(selectedIdx) ? that._selectedIndex[this.idx] : selectedIdx;
-            })
+
+                if (that.isCascade && !isNaN(selectedIdx)) {
+                    var updateColIdx = that._updatePickerData(this.idx + 1)
+                    for (var i = updateColIdx.length-1; i >= 0; i--) {
+                        $('.j-picker-wheel-wrapper').children('div').eq(updateColIdx[i]).remove()
+                        
+                    }
+                    setTimeout(function(){
+                        for (var i = 0; i < updateColIdx.length; i++) {
+                            that._renderScrollList(that._values[updateColIdx[i]])
+                        }
+                    },0)
+
+                    setTimeout(function(){
+                        for (var i = 0; i < updateColIdx.length; i++) {
+                            that._createScroll(updateColIdx[i])
+                        }
+                    },0)
+                    
+                       
+                    console.log(updateColIdx)
+                }
+            }
+
+            console.log(that._values)
         },
         _canConfirm() {
             return !this.pending && this.BScroller.every((wheel) => {
-              return !wheel.isInTransition
+                return !wheel.isInTransition
             })
-          },
+        },
         _setStyle: function () {
             this.$dom.css({
                 "z-index": this.option.zIndex
