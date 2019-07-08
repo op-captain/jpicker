@@ -100,13 +100,13 @@
         //picker实例 picker.create([[obj1,obj2],[obj1,obj2],[obj1,obj2]], [index1,index2,index3], {option},boolean) 最后一个参数为 真 表示级联菜单
         var picker = new JPicker();
 
-        picker.create(list, [1, 0, 0], {
+        picker.create(cascade, [1, 0, 0], {
             confirmCallback: function (data, index) {
                 console.log(data)
                 console.log(index)
                 this.hide()
             }
-        }, false)
+        }, true)
 
         //api调用 显示
         $('#show').on('click', function () {
