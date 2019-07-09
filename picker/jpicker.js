@@ -235,12 +235,13 @@
 
                     this._values[i] = coloumData;
 
+                    //更新后数据项数，比当前索引小，就默认给 0
                     this._selectedIndex[i] = this._selectedIndex[i] < data.length ? this._selectedIndex[i] || 0 : 0;
 
                     col.push(i)
                 }
-
-                if (data[this._selectedIndex[i]].children && i == this.maxColoum - 1) {
+                
+                if (!data[this._selectedIndex[i]].children.length || i == this.maxColoum - 1) {
                     data = null;
                 } else {
                     data = data.length ? data[this._selectedIndex[i]].children : null;
@@ -252,36 +253,37 @@
             return col;
         },
         _pickerChange: function (that) {
-
+            //值相同的时候不需要处理。这里同时防止只有一个选项的时候，触发change处理
             if (this.getSelectedIndex() !== that._selectedIndex[this.idx]) {
+
                 //当前BScroll选中的item
                 var selectedIdx = this.getSelectedIndex();
                 that._selectedIndex[this.idx] = isNaN(selectedIdx) ? that._selectedIndex[this.idx] : selectedIdx;
 
+                //初始化的时候，会执行_pickerChange 而且selectedIdx为NaN 而在初始化的时候，不需要做change的处理
                 if (that.isCascade && !isNaN(selectedIdx)) {
                     var updateColIdx = that._updatePickerData(this.idx + 1)
+                    //step1：移除原有DOM
                     for (var i = updateColIdx.length-1; i >= 0; i--) {
                         $('.j-picker-wheel-wrapper').children('div').eq(updateColIdx[i]).remove()
                         
                     }
+                    //step2：创建新DOM
                     setTimeout(function(){
                         for (var i = 0; i < updateColIdx.length; i++) {
                             that._renderScrollList(that._values[updateColIdx[i]])
                         }
                     },0)
 
+                    //step3：新建betterScroll
                     setTimeout(function(){
                         for (var i = 0; i < updateColIdx.length; i++) {
                             that._createScroll(updateColIdx[i])
                         }
                     },0)
                     
-                       
-                    console.log(updateColIdx)
                 }
             }
-
-            console.log(that._values)
         },
         _canConfirm() {
             return !this.pending && this.BScroller.every((wheel) => {

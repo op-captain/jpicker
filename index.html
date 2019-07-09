@@ -19,7 +19,7 @@
 
     <script>
         //数据
-        var list = [[], [], []];
+        var list = [[]];
 
         for (var i = 0; i < list.length; i++) {
             for (var n = 0; n < 10; n++) {
@@ -52,31 +52,82 @@
             return list;
         }
         createCascade(cascade, 3, 2, 3)
-        console.log(cascade) 
+        console.log(cascade)
 
-        cascade = [{
+        cascade3 = [
+            {
+                "value": "1--1",
+                "text": "湖北省",
+                "children": [
+                    {
+                        "value": "2--1",
+                        "text": "武汉市",
+                        "children": [
+                            {
+                                "value": "3--1",
+                                "text": "汉阳区",
+                                "children": [
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "value": "2--2",
+                        "text": "天门市",
+                        "children": [
+                            {
+                                "value": "3--1",
+                                "text": "天门区",
+                                "children": [
+                                ]
+                            },
+                            {
+                                "value": "3--2",
+                                "text": "武湖区",
+                                "children": [
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "value": "1--2",
+                "text": "湖南省",
+                "children": [
+                    {
+                        "value": "2--1",
+                        "text": "长沙市",
+                        "children": [
+                            {
+                                "value": "3--1",
+                                "text": "辣椒区",
+                                "children": [
+                                ]
+                            },
+                            {
+                                "value": "3--2",
+                                "text": "甜品区",
+                                "children": [
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+
+        cascade2 = [{
             "value": "1--1",
             "text": "1-casc-1",
             "children": [{
                 "value": "2--1",
                 "text": "2-casc-1",
-                "children": [{
-                    "value": "3--1",
-                    "text": "3-casc-1",
-                    "children": []
-                }]
+                "children": []
             }, {
                 "value": "2--2",
                 "text": "2-casc-2",
-                "children": [{
-                    "value": "3--1",
-                    "text": "3-casc-1",
-                    "children": []
-                }, {
-                    "value": "3--2",
-                    "text": "3-casc-2",
-                    "children": []
-                }]
+                "children": []
             }]
         }, {
             "value": "1--2",
@@ -84,15 +135,7 @@
             "children": [{
                 "value": "2--1",
                 "text": "2-casc-1",
-                "children": [{
-                    "value": "3--1",
-                    "text": "3-casc-1",
-                    "children": []
-                }, {
-                    "value": "3--2",
-                    "text": "3-casc-2",
-                    "children": []
-                }]
+                "children": []
             }]
         }]
 
@@ -100,7 +143,7 @@
         //picker实例 picker.create([[obj1,obj2],[obj1,obj2],[obj1,obj2]], [index1,index2,index3], {option},boolean) 最后一个参数为 真 表示级联菜单
         var picker = new JPicker();
 
-        picker.create(cascade, [1, 0, 0], {
+        picker.create(cascade3, [0, 1, 0], {
             confirmCallback: function (data, index) {
                 console.log(data)
                 console.log(index)
